@@ -9,7 +9,10 @@ const { pubClient, subClient } = require('./redis');
 const setupSocketHandlers = require('./socket');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || '*',
+  methods: ['GET', 'POST']
+}));
 app.use(helmet());
 app.use(express.json());
 
@@ -17,7 +20,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: '*', // For MVP, allow all. In prod, restrict to client URL
+    origin: process.env.CLIENT_URL || '*',
     methods: ['GET', 'POST']
   }
 });
