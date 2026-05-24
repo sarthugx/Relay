@@ -22,7 +22,12 @@ module.exports = function setupSocketHandlers(io, socket) {
     console.log(`User ${socket.id} joining ${mode} queue as ${username}`);
     
     // Add them to the Redis queue to await a match.
-    await Matchmaker.joinQueue(socket.id, socket.data.username, socket.data.mode);
+    Matchmaker.joinQueue(
+      socket,
+      io,
+      socket.data.username,
+      socket.data.mode
+    );
   });
 
   /**
@@ -53,7 +58,7 @@ module.exports = function setupSocketHandlers(io, socket) {
       }
     }
     // Also try to remove them from the matchmaking queue just in case they were waiting.
-    await Matchmaker.leaveQueue(socket.id);
+    Matchmaker.leaveQueue(socket.id);
   });
 
   socket.on('disconnect', () => {
