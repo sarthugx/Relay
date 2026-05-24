@@ -34,7 +34,7 @@ export default function Home({ onStart }) {
               <Video className="w-12 h-12 text-primary-500" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold mb-2">Omegle Clone</h1>
+          <h1 className="text-4xl font-bold mb-2">P2P-Chat</h1>
           <p className="text-gray-400 mb-6">Meet random strangers anonymously.</p>
 
           <div className="mb-6">

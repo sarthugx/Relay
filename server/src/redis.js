@@ -1,13 +1,18 @@
 const { createClient } = require('redis');
 
-const REDIS_URL = process.env.REDIS_URL;
+const REDIS_URL =
+  process.env.REDIS_URL || 'redis://localhost:16379';
+
+const isProduction = REDIS_URL.startsWith('rediss://');
 
 const pubClient = createClient({
   url: REDIS_URL,
-  socket: {
-    tls: true,
-    rejectUnauthorized: false
-  }
+  socket: isProduction
+    ? {
+        tls: true,
+        rejectUnauthorized: false,
+      }
+    : {},
 });
 
 const subClient = pubClient.duplicate();
@@ -22,5 +27,5 @@ subClient.on('error', (err) =>
 
 module.exports = {
   pubClient,
-  subClient
+  subClient,
 };
