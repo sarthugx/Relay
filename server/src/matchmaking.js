@@ -69,7 +69,7 @@ class Matchmaker {
       if (mode === 'video') {
         setTimeout(() => {
           io.to(user1.socket.id).emit('webrtc_initiate');
-        }, 1000);
+        }, 2000);
       }
     }
   }

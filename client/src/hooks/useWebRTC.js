@@ -17,7 +17,7 @@ const ICE_SERVERS = {
  * @param {import('socket.io-client').Socket} socket - The connected Socket.IO client.
  * @returns {Object} localStream, remoteStream, toggle functions, and mute states.
  */
-export function useWebRTC(roomId, socket) {
+export function useWebRTC(roomId, socket, enabled = true) {
   // State to hold the user's own camera/mic stream
   const [localStream, setLocalStream] = useState(null);
   // State to hold the stranger's camera/mic stream
@@ -30,6 +30,7 @@ export function useWebRTC(roomId, socket) {
   const peerConnectionRef = useRef(null);
 
   useEffect(() => {
+    if (!enabled) return;
     let stream = null;
 
     /**

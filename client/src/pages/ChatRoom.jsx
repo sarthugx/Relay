@@ -18,7 +18,18 @@ import ChatBox from '../components/ChatBox';
 export default function ChatRoom({ roomId, mode, strangerName, onLeave, onNext }) {
   // Custom hook that manages the complex WebRTC connection state.
   // It handles requesting camera permissions, creating peer connections, and signaling.
-  const { localStream, remoteStream, toggleAudio, toggleVideo, isAudioMuted, isVideoMuted } = useWebRTC(roomId, socket);
+  const {
+    localStream,
+    remoteStream,
+    toggleAudio,
+    toggleVideo,
+    isAudioMuted,
+    isVideoMuted
+  } = useWebRTC(
+    roomId,
+    socket,
+    mode === 'video'
+    );
   
   // Local state to store the history of text messages in this room.
   const [messages, setMessages] = useState([]);

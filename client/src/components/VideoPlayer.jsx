@@ -16,6 +16,8 @@ export default function VideoPlayer({ stream, label, muted }) {
         autoPlay
         playsInline
         muted={muted}
+        controls={false}
+        disablePictureInPicture
         className="w-full h-full object-contain"
       />
       <div className="absolute top-2 left-2 bg-black/60 px-2 py-1 text-xs font-medium backdrop-blur-sm text-white">
