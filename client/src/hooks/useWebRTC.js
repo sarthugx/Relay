@@ -48,16 +48,23 @@ export function useWebRTC(roomId, socket) {
         // 3. Attach our local media tracks to the WebRTC connection
         stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
-        // 4. Listen for incoming tracks (the stranger's video/audio)
+        const inboundStream = new MediaStream();
+
+        setRemoteStream(inboundStream);
+
         pc.ontrack = (event) => {
-          // When a track arrives, save it to state to be rendered in the <video> tag
-          setRemoteStream(event.streams[0]);
+          console.log('Received remote track');
+
+          event.streams[0].getTracks().forEach((track) => {
+            inboundStream.addTrack(track);
+          }); 
         };
 
         // 5. ICE Candidate Gathering
         // As the STUN server discovers network routing paths (ICE candidates),
         // we must send them to the stranger via our Socket.IO server.
         pc.onicecandidate = (event) => {
+          console.log('Sending ICE candidate');
           if (event.candidate) {
             socket.emit('webrtc_ice_candidate', {
               roomId,
@@ -71,7 +78,10 @@ export function useWebRTC(roomId, socket) {
         // ==========================================
 
         // When the stranger sends us an "Offer" to connect:
+        socket.off('webrtc_offer');
+
         socket.on('webrtc_offer', async ({ offer }) => {
+          console.log('Received WebRTC offer');
           // Save their offer as the remote description
           await pc.setRemoteDescription(new RTCSessionDescription(offer));
           // Create an "Answer" to their offer
@@ -83,13 +93,19 @@ export function useWebRTC(roomId, socket) {
         });
 
         // When the stranger replies to our Offer with an "Answer":
+        socket.off('webrtc_answer');
+
         socket.on('webrtc_answer', async ({ answer }) => {
+          console.log('Received WebRTC answer');
           // Save their answer as the remote description. The connection is now established!
           await pc.setRemoteDescription(new RTCSessionDescription(answer));
         });
 
         // When the stranger sends us their network routing info (ICE Candidate):
+        socket.off('webrtc_ice_candidate');
+
         socket.on('webrtc_ice_candidate', async ({ candidate }) => {
+          console.log('Received ICE candidate');
           try {
             // Add their routing info to our connection so we know how to reach them
             await pc.addIceCandidate(new RTCIceCandidate(candidate));
@@ -102,7 +118,10 @@ export function useWebRTC(roomId, socket) {
         socket.emit('webrtc_ready', { roomId });
 
         // The server decides who the "Initiator" is and tells them to start the handshake
+        socket.off('webrtc_initiate');
+
         socket.on('webrtc_initiate', async () => {
+          console.log('Initiating WebRTC connection');
           // Create the initial WebRTC connection Offer
           const offer = await pc.createOffer();
           // Save it locally
